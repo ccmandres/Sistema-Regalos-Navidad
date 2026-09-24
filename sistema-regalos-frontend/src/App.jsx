@@ -120,76 +120,24 @@
 // }
 
 // export default App
-import { useEffect, useState } from 'react';
+import { MainLayout } from './components/MainLayout';
 import { useAuth } from './hooks/useAuth';
-import { beneficiariosService } from './services/beneficiariosService';
 
 function App() {
-  const { user, profile, loading } = useAuth();
-  const [beneficiarios, setBeneficiarios] = useState([]);
-  const [errorMensaje, setErrorMensaje] = useState(null);
-  const [cargandoDatos, setCargandoDatos] = useState(false);
-
-  // Probar la lectura de beneficiarios
-  useEffect(() => {
-    const probarServicio = async () => {
-      setCargandoDatos(true);
-      try {
-        const datos = await beneficiariosService.getBeneficiarios();
-        setBeneficiarios(datos);
-        setErrorMensaje(null);
-      } catch (err) {
-        console.error('Error al probar servicio:', err);
-        setErrorMensaje(err.message);
-      } finally {
-        setCargandoDatos(false);
-      }
-    };
-
-    if (!loading) {
-      probarServicio();
-    }
-  }, [loading]);
+  const { user } = useAuth();
 
   return (
-    <div style={{ padding: '30px', fontFamily: 'sans-serif', maxWidth: '700px', margin: '0 auto' }}>
-      <h2>Municipalidad de San Joaquín</h2>
-      <h3>Prueba de Servicio de Beneficiarios (Sprint 1)</h3>
-      <hr />
-
-      {/* Estado de Autenticación */}
-      <div style={{ background: user ? '#e6fffa' : '#fff5f5', padding: '15px', borderRadius: '8px', marginBottom: '20px' }}>
-        <p style={{ margin: 0 }}>
-          <strong>Estado Sesión:</strong> {loading ? 'Cargando...' : user ? `✅ Conectado (${user.email})` : '🔒 Sin sesión activa'}
-        </p>
-        {profile && <p style={{ margin: '5px 0 0 0' }}><strong>Rol:</strong> {profile.rol}</p>}
-      </div>
-
-      {/* Estado de la Base de Datos */}
-      <h4>Lectura de Tabla 'beneficiarios':</h4>
-      {cargandoDatos ? (
-        <p>⏳ Consultando Supabase...</p>
-      ) : errorMensaje ? (
-        <p style={{ color: 'red', background: '#ffe3e3', padding: '10px', borderRadius: '5px' }}>
-          ❌ {errorMensaje}
-        </p>
-      ) : (
-        <div>
-          <p style={{ color: 'green' }}>
-            ✅ Conexión exitosa a Supabase. Se encontraron <strong>{beneficiarios.length}</strong> beneficiario(s).
+    <MainLayout>
+      <div style={{ backgroundColor: '#FFFFFF', padding: '24px', borderRadius: '8px', boxShadow: '0 1px 3px rgba(0,0,0,0.1)' }}>
+        <h2>Bienvenido al Portal Municipal</h2>
+        <p>Este es el contenedor principal (`MainLayout`) del sistema.</p>
+        {!user && (
+          <p style={{ color: '#718096' }}>
+            Actualmente estás viendo la interfaz en modo visitante (Sin sesión activa).
           </p>
-          {beneficiarios.length > 0 && (
-            <ul style={{ background: '#f7fafc', padding: '15px 30px', borderRadius: '8px' }}>
-              {beneficiarios.map((b) => (
-                <li key={b.id}>
-                  <strong>{b.nombre_completo}</strong> - RUT: {b.rut_menor} ({b.rango_etario})
-                </li>
-              ))}
-            </ul>
-          )}
-        </div>
-      )}
-    </div>
+        )}
+      </div>
+    </MainLayout>
   );
 }
 
