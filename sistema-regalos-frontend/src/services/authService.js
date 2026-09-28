@@ -15,7 +15,7 @@ async login(email, password) {
     throw new Error(error.message);
   }
 
-  return data;
+  return data; // Retorna el objeto de usuario autenticado
 },
 
 // Cierra la sesion activa

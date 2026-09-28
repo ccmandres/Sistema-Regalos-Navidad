@@ -122,13 +122,15 @@
 // export default App
 import { MainLayout } from './components/MainLayout';
 import { useAuth } from './hooks/useAuth';
+import VistaDirigente from './components/VistaDirigente';
+
 
 function App() {
   const { user } = useAuth();
 
   return (
     <MainLayout>
-      <div style={{ backgroundColor: '#FFFFFF', padding: '24px', borderRadius: '8px', boxShadow: '0 1px 3px rgba(0,0,0,0.1)' }}>
+      <div style={{ backgroundColor: '#FFFFFF', padding: '24px', borderRadius: '8px', boxShadow: '0 1px 3px rgba(0,0,0,0.1)', marginBottom: '20px' }}>
         <h2>Bienvenido al Portal Municipal</h2>
         <p>Este es el contenedor principal (`MainLayout`) del sistema.</p>
         {!user && (
@@ -137,6 +139,9 @@ function App() {
           </p>
         )}
       </div>
+      
+      <VistaDirigente />
+      
     </MainLayout>
   );
 }
