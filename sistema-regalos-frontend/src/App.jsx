@@ -1,149 +1,48 @@
-// import { useState } from 'react'
-// import heroImg from './assets/hero.png'
-// import reactLogo from './assets/react.svg'
-// import viteLogo from './assets/vite.svg'
-// import './App.css'
-
-// function App() {
-//   const [count, setCount] = useState(0)
-
-//   return (
-//     <>
-//       <section id="center">
-//         <div className="hero">
-//           <img src={heroImg} className="base" width="170" height="179" alt="" />
-//           <img src={reactLogo} className="framework" alt="React logo" />
-//           <img src={viteLogo} className="vite" alt="Vite logo" />
-//         </div>
-//         <div>
-//           <h1>Get started</h1>
-//           <p>
-//             Edit <code>src/App.jsx</code> and save to test <code>HMR</code>
-//           </p>
-//         </div>
-//         <button
-//           type="button"
-//           className="counter"
-//           onClick={() => setCount((count) => count + 1)}
-//         >
-//           Count is {count}
-//         </button>
-//       </section>
-
-//       <div className="ticks"></div>
-
-//       <section id="next-steps">
-//         <div id="docs">
-//           <svg className="icon" role="presentation" aria-hidden="true">
-//             <use href="/icons.svg#documentation-icon"></use>
-//           </svg>
-//           <h2>Documentation</h2>
-//           <p>Your questions, answered</p>
-//           <ul>
-//             <li>
-//               <a href="https://vite.dev/" target="_blank">
-//                 <img className="logo" src={viteLogo} alt="" />
-//                 Explore Vite
-//               </a>
-//             </li>
-//             <li>
-//               <a href="https://react.dev/" target="_blank">
-//                 <img className="button-icon" src={reactLogo} alt="" />
-//                 Learn more
-//               </a>
-//             </li>
-//           </ul>
-//         </div>
-//         <div id="social">
-//           <svg className="icon" role="presentation" aria-hidden="true">
-//             <use href="/icons.svg#social-icon"></use>
-//           </svg>
-//           <h2>Connect with us</h2>
-//           <p>Join the Vite community</p>
-//           <ul>
-//             <li>
-//               <a href="https://github.com/vitejs/vite" target="_blank">
-//                 <svg
-//                   className="button-icon"
-//                   role="presentation"
-//                   aria-hidden="true"
-//                 >
-//                   <use href="/icons.svg#github-icon"></use>
-//                 </svg>
-//                 GitHub
-//               </a>
-//             </li>
-//             <li>
-//               <a href="https://chat.vite.dev/" target="_blank">
-//                 <svg
-//                   className="button-icon"
-//                   role="presentation"
-//                   aria-hidden="true"
-//                 >
-//                   <use href="/icons.svg#discord-icon"></use>
-//                 </svg>
-//                 Discord
-//               </a>
-//             </li>
-//             <li>
-//               <a href="https://x.com/vite_js" target="_blank">
-//                 <svg
-//                   className="button-icon"
-//                   role="presentation"
-//                   aria-hidden="true"
-//                 >
-//                   <use href="/icons.svg#x-icon"></use>
-//                 </svg>
-//                 X.com
-//               </a>
-//             </li>
-//             <li>
-//               <a href="https://bsky.app/profile/vite.dev" target="_blank">
-//                 <svg
-//                   className="button-icon"
-//                   role="presentation"
-//                   aria-hidden="true"
-//                 >
-//                   <use href="/icons.svg#bluesky-icon"></use>
-//                 </svg>
-//                 Bluesky
-//               </a>
-//             </li>
-//           </ul>
-//         </div>
-//       </section>
-
-//       <div className="ticks"></div>
-//       <section id="spacer"></section>
-//     </>
-//   )
-// }
-
-// export default App
 import { MainLayout } from './components/MainLayout';
-import { useAuth } from './hooks/useAuth';
-import VistaDirigente from './components/VistaDirigente';
+import { AuthProvider, useAuth } from './hooks/useAuth';
+import { Login } from './pages/Login';
 
 
-function App() {
-  const { user } = useAuth();
+function AppContent() {
+  const { user, profile, loading } = useAuth();
+
+  if (loading) {
+    return (
+      <div style={{ textAlign: 'center', padding: '40px', fontFamily: 'sans-serif' }}>
+        Cargando sistema...
+      </div>
+    );
+  }
+
+  if (!user) {
+    return <Login />;
+  }
 
   return (
     <MainLayout>
-      <div style={{ backgroundColor: '#FFFFFF', padding: '24px', borderRadius: '8px', boxShadow: '0 1px 3px rgba(0,0,0,0.1)', marginBottom: '20px' }}>
-        <h2>Bienvenido al Portal Municipal</h2>
-        <p>Este es el contenedor principal (`MainLayout`) del sistema.</p>
-        {!user && (
-          <p style={{ color: '#718096' }}>
-            Actualmente estás viendo la interfaz en modo visitante (Sin sesión activa).
-          </p>
-        )}
+      <div
+        style={{
+          backgroundColor: '#FFFFFF',
+          padding: '24px',
+          borderRadius: '8px',
+          boxShadow: '0 1px 3px rgba(0,0,0,0.1)',
+        }}
+      >
+        <h2>Panel Principal</h2>
+        <p>
+          ¡Hola <strong>{profile?.nombre_completo || user.email}</strong>! Has
+          ingresado correctamente con el rol:{' '}
+          <strong>{profile?.rol || 'Usuario'}</strong>.
+        </p>
       </div>
-      
-      <VistaDirigente />
-      
     </MainLayout>
   );
 }
 
-export default App;
+export default function App() {
+  return (
+    <AuthProvider>
+      <AppContent />
+    </AuthProvider>
+  );
+}
