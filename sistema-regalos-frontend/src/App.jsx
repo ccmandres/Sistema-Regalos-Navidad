@@ -1,52 +1,70 @@
 import { MainLayout } from './components/MainLayout';
 import { AuthProvider, useAuth } from './hooks/useAuth';
 import { Login } from './pages/Login';
-import VistaDirigente from './components/VistaDirigente'; // ¡Importamos la vista!
+import VistaDirigente from './components/VistaDirigente';
+import VistaAdmin from './components/VistaAdmin';
+// import VistaOperador from './components/VistaOperador';
 
 function AppContent() {
   const { user, profile, loading } = useAuth();
 
   if (loading) {
     return (
-      <div style={{ textAlign: 'center', padding: '40px', fontFamily: 'sans-serif' }}>
-        Cargando sistema...
+      <div className="flex justify-center items-center h-screen bg-gray-50">
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#004A87]"></div>
       </div>
     );
   }
 
-  // Si no hay usuario, mostramos el Login
+  // Si no hay sesión activa, redirige o muestra el Login obligatoriamente
   if (!user) {
     return <Login />;
   }
 
-  // Si el usuario inició sesión, verificamos su rol para mostrar la vista correcta
+  // Guardián basado en el rol obtenido de la tabla 'perfiles' de Supabase
+  const renderizarVistaPorRol = () => {
+    const rol = profile?.rol;
+
+    switch (rol) {
+      case 'Dirigente de Junta de Vecinos':
+        return <VistaDirigente />;
+        
+      case 'Administrador Municipal':
+        return <VistaAdmin />;
+        
+      case 'Operador':
+        // return <VistaOperador />; // Descomentar cuando crees la vista del operador
+        return <VistaPlaceholder rol="Operador" usuario={profile?.nombre_completo || user.email} />;
+        
+      default:
+        return (
+          <div className="bg-red-50 border border-red-200 p-6 rounded-xl text-red-700 max-w-lg mx-auto mt-10">
+            <h3 className="font-bold text-lg">Acceso Restringido</h3>
+            <p className="mt-1 text-sm">Tu cuenta no tiene un rol asignado válido en el sistema. Contacta al Administrador Municipal.</p>
+          </div>
+        );
+    }
+  };
+
   return (
     <MainLayout>
-      {profile?.rol === 'Dirigente de Junta de Vecinos' ? (
-        // Si es dirigente, mostramos su vista con los botones y la tabla
-        <VistaDirigente />
-      ) : (
-        // Si tiene otro rol (Administrador u Operador), mostramos el panel por defecto por ahora
-        <div
-          style={{
-            backgroundColor: '#FFFFFF',
-            padding: '24px',
-            borderRadius: '8px',
-            boxShadow: '0 1px 3px rgba(0,0,0,0.1)',
-          }}
-        >
-          <h2>Panel Principal</h2>
-          <p>
-            ¡Hola <strong>{profile?.nombre_completo || user.email}</strong>! Has
-            ingresado correctamente con el rol:{' '}
-            <strong>{profile?.rol || 'Usuario'}</strong>.
-          </p>
-          <p className="text-gray-500 mt-4">
-            (La vista para este rol aún está en construcción)
-          </p>
-        </div>
-      )}
+      {renderizarVistaPorRol()}
     </MainLayout>
+  );
+}
+
+// Componente temporal para roles en desarrollo
+function VistaPlaceholder({ rol, usuario }) {
+  return (
+    <div className="bg-white p-8 rounded-2xl shadow-sm border border-gray-100 max-w-2xl mx-auto mt-6">
+      <h2 className="text-2xl font-extrabold text-gray-900">Panel de {rol}</h2>
+      <p className="text-gray-600 mt-2">
+        ¡Hola, <strong>{usuario}</strong>! Has ingresado con éxito.
+      </p>
+      <div className="mt-6 p-4 bg-blue-50 border border-blue-100 rounded-xl text-blue-800 text-sm">
+        🛠️ Este módulo se encuentra planificado en el siguiente sprint de desarrollo.
+      </div>
+    </div>
   );
 }
 
