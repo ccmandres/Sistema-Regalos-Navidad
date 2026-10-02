@@ -42,16 +42,18 @@ export const beneficiariosService = {
     // INSERTAR: Agrega un nuevo beneficiario a la tabla 'beneficiarios'. Incluye la deteccion de duplicados via la restriccion de UNIQUE(rut_menor) en la tabla 'beneficiarios'. Retorna el objeto del beneficiario insertado con los campos: id, rut_menor, nombres, apellidos, fecha_nacimiento, edad, rut_adulto_responsable, nombre_adulto_responsable
     // @param {Object} beneficiario
 
-    async crearBeneficiario(datosMenor) {
+async crearBeneficiario(datosMenor) {
         const { 
             rut_menor,
             nombres,
             apellidos,
             fecha_nacimiento,
+            edad, // <-- Agregado
             rango_etario,
             sexo,
             rut_adulto_responsable,
-            nombre_adulto_responsable
+            nombre_adulto_responsable,
+            territorio_id // <-- Agregado
         } = datosMenor;
 
         const { data, error } = await supabase
@@ -61,10 +63,12 @@ export const beneficiariosService = {
                 nombres,
                 apellidos,
                 fecha_nacimiento,
+                edad, // <-- Agregado
                 rango_etario,
                 sexo,
                 rut_adulto_responsable,
-                nombre_adulto_responsable
+                nombre_adulto_responsable,
+                territorio_id // <-- Agregado
             }])
             .select()
             .single();
@@ -81,7 +85,7 @@ export const beneficiariosService = {
             }
             // Otros errores
             console.log('Error al crear beneficiario:', error.message);
-            throw new Error('Error al crear beneficiario');
+            throw new Error(`Error de Supabase: ${error.message}`);
         }
 
         return data;
